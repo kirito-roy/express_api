@@ -12,14 +12,29 @@ const app = express();
 const PORT = 5000;
 
 // Use the correct env variable name (MONGO_URL from docker-compose)
-const mongoURI = process.env.MONGO_URL;
 
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => console.log('✅ Connected to MongoDB'))
-    .catch(err => console.error('❌ MongoDB error:', err));
+// --- MongoDB Connection Setup ---
+// Get the MongoDB URI from environment variables (e.g., from .env or Render config)
+// The URI from mongodbConnection.txt is for MongoDB Atlas, not the local 'mongo:27017' from docker-compose.
+// Make sure to use the correct URI based on where your MongoDB is hosted.
+// If using MongoDB Atlas, uncomment and use the Atlas URI:
+const mongoURI = process.env.MONGO_URL; // This would typically be for a local or Render Private Service MongoDB
+// const mongoURI = process.env.MONGODB_ATLAS_URI; // Use this if you put your Atlas URI in .env as MONGODB_ATLAS_URI
+
+// Mongoose client options for MongoDB Atlas Stable API version (from mongodbConnection.txt)
+const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+
+mongoose.connect(mongoURI, clientOptions) // Use clientOptions for MongoDB Atlas connections
+    .then(() => {
+        console.log('✅ Connected to MongoDB!');
+        // Optional: Ping the deployment to confirm connection (as in mongodbConnection.txt)
+        // This is typically for initial connection verification, not for every app start
+        mongoose.connection.db.admin().command({ ping: 1 })
+            .then(() => console.log("Pinged your deployment. You successfully connected to MongoDB!"))
+            .catch(err => console.error("Ping command failed:", err));
+    })
+    .catch(err => console.error('❌ MongoDB connection error:', err));
+// --- End MongoDB Connection Setup ---
 
 // add all the routes here 
 app.use(express.json());
@@ -36,7 +51,7 @@ app.use(cors());
 // };
 // app.use(cors(corsOptions));
 // <--- END CORS CONFIGURATION ---
-app.get('/',async(req, res) => {
+app.get('/', async (req, res) => {
     res.send(`🚀 Server is running on http://localhost:${PORT}`);
 });
 
