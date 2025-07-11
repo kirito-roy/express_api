@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
-    name: {
+  name: {
     type: String,
     required: true,
-    unique: true,
+
     trim: true,
   },
-    email: {
+  email: {
     type: String,
     required: true,
     unique: true,
@@ -14,26 +14,26 @@ const UserSchema = new mongoose.Schema({
     lowercase: true,
     match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Please enter a valid email address']
   },
-    password : {
+  password: {
     type: String,
     required: true,
   },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
-    role: {
-        type: String,
-        enum: ['user', 'admin'],
-        default: 'user'
-    }
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  }
 });
 module.exports = mongoose.model('User', UserSchema);
