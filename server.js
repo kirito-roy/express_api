@@ -52,7 +52,7 @@ app.use(cors());
 // app.use(cors(corsOptions));
 // <--- END CORS CONFIGURATION ---
 app.get('/', async (req, res) => {
-    res.send(`🚀 Server is running on http://localhost:${PORT}`);
+    res.json(`🚀 Server is running on http://localhost:${PORT}`);
 });
 
 app.use('/auth', auth); // <--- ADD THIS LINE: Use the auth routes
