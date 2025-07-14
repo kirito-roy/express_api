@@ -2,8 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
 const dotenv = require('dotenv');
-const studentRoutes = require('./routes/student');
-const EmployeeRoutes = require('./routes/employee')
 const cors = require('cors'); // <--- ADD THIS LINE: Import the cors package
 const auth = require('./routes/auth'); // <--- ADD THIS LINE: Import the auth routes
 dotenv.config();
@@ -57,8 +55,7 @@ app.get('/', async (req, res) => {
 
 app.use('/auth', auth); // <--- ADD THIS LINE: Use the auth routes
 app.use('/api', userRoutes);
-app.use('/student', studentRoutes);
-app.use('/employee', EmployeeRoutes);
+
 
 
 app.listen(PORT, () => {
