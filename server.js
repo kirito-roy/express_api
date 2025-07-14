@@ -10,29 +10,38 @@ const app = express();
 const PORT = 5000;
 
 // Use the correct env variable name (MONGO_URL from docker-compose)
-
 // --- MongoDB Connection Setup ---
-// Get the MongoDB URI from environment variables (e.g., from .env or Render config)
-// The URI from mongodbConnection.txt is for MongoDB Atlas, not the local 'mongo:27017' from docker-compose.
-// Make sure to use the correct URI based on where your MongoDB is hosted.
-// If using MongoDB Atlas, uncomment and use the Atlas URI:
-const mongoURI = process.env.MONGO_URL; // This would typically be for a local or Render Private Service MongoDB
-// const mongoURI = process.env.MONGODB_ATLAS_URI; // Use this if you put your Atlas URI in .env as MONGODB_ATLAS_URI
 
-// Mongoose client options for MongoDB Atlas Stable API version (from mongodbConnection.txt)
-const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+// Select the right MongoDB URI based on environment
+const mongoURI = process.env.MONGODB_ATLAS_URI || process.env.MONGO_URL;
 
-mongoose.connect(mongoURI, clientOptions) // Use clientOptions for MongoDB Atlas connections
+if (!mongoURI) {
+    console.error('❌ No MongoDB connection string found in environment variables!');
+    process.exit(1);
+}
+
+// Options: Only use serverApi for Atlas
+const isAtlas = mongoURI.includes('mongodb+srv://');
+const clientOptions = isAtlas
+    ? { serverApi: { version: '1', strict: true, deprecationErrors: true } }
+    : {}; // Empty options for local/dev
+
+mongoose.connect(mongoURI, clientOptions)
     .then(() => {
-        console.log('✅ Connected to MongoDB!');
-        // Optional: Ping the deployment to confirm connection (as in mongodbConnection.txt)
-        // This is typically for initial connection verification, not for every app start
-        mongoose.connection.db.admin().command({ ping: 1 })
-            .then(() => console.log("Pinged your deployment. You successfully connected to MongoDB!"))
-            .catch(err => console.error("Ping command failed:", err));
+        console.log('✅ Connected to MongoDB:', isAtlas ? 'Atlas (production)' : 'Local/Docker (development)');
+        if (isAtlas) {
+            // Optional: Ping Atlas deployment
+            mongoose.connection.db.admin().command({ ping: 1 })
+                .then(() => console.log('🏓 Pinged MongoDB Atlas successfully!'))
+                .catch(err => console.warn('⚠️ Ping failed:', err));
+        }
     })
-    .catch(err => console.error('❌ MongoDB connection error:', err));
+    .catch(err => {
+        console.error('❌ MongoDB connection error:', err);
+        process.exit(1);
+    });
 // --- End MongoDB Connection Setup ---
+
 
 // add all the routes here 
 app.use(express.json());
