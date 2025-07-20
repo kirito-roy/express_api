@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const userRoutes = require('./routes/user');
 const dotenv = require('dotenv');
 const cors = require('cors'); // <--- ADD THIS LINE: Import the cors package
-const auth = require('./routes/auth'); // <--- ADD THIS LINE: Import the auth routes
+// import routers here 
+const auth = require('./routes/auth');
+const userRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
+
 dotenv.config();
 
 const app = express();
@@ -43,28 +46,25 @@ mongoose.connect(mongoURI, clientOptions)
 // --- End MongoDB Connection Setup ---
 
 
-// add all the routes here 
-app.use(express.json());
-// <--- ADD CORS CONFIGURATION HERE ---
-// Option 1: Allow all origins (good for quick development, less secure for production)
-app.use(cors());
+// --- Middleware ---
+app.use(express.json({ limit: '50mb' })); // Allow large JSON bodies
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // For form data
 
-// Option 2: Allow specific origins (recommended for production)
-// const corsOptions = {
-//   origin: 'http://localhost:5173', // Replace with your React app's exact URL
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Specify allowed HTTP methods
-//   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
-//   credentials: true, // Allow cookies to be sent
-// };
-// app.use(cors(corsOptions));
-// <--- END CORS CONFIGURATION ---
+// --- CORS Configuration ---
+const corsOptions = {
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+};
+app.use(cors(corsOptions)); // Use for dev and production
+// --- End CORS Configuration ---
 app.get('/', async (req, res) => {
     res.json(`🚀 Server is running on http://localhost:${PORT}`);
 });
 
 app.use('/auth', auth); // <--- ADD THIS LINE: Use the auth routes
 app.use('/api', userRoutes);
-
+app.use("/admin", adminRoutes);
 
 
 app.listen(PORT, () => {
