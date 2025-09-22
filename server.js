@@ -65,6 +65,7 @@ app.get('/', async (req, res) => {
 app.use('/auth', auth); // <--- ADD THIS LINE: Use the auth routes
 app.use('/api', userRoutes);
 app.use("/admin", adminRoutes);
+app.use('/searches', require('./routes/searches'));
 
 
 app.listen(PORT, () => {
