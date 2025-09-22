@@ -1,7 +1,7 @@
 # server/Dockerfile
 FROM node:20-alpine
 
-WORKDIR /app/express_api
+WORKDIR /app
 
 COPY package*.json ./
 
