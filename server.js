@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors'); // <--- ADD THIS LINE: Import the cors package
 // import routers here 
-const auth = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 
@@ -62,7 +61,7 @@ app.get('/', async (req, res) => {
     res.json(`🚀 Server is running on http://localhost:${PORT}`);
 });
 
-app.use('/auth', auth); // <--- ADD THIS LINE: Use the auth routes
+app.use('/auth', require('./routes/auth'));// <--- ADD THIS LINE: Use the auth routes
 app.use('/user', userRoutes);
 app.use("/admin", adminRoutes);
 app.use('/searches', require('./routes/searches'));
